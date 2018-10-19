@@ -1,0 +1,8 @@
+<div class="row">
+  <div class="col text-right">
+    <h3>
+      <span *ngIf="!recentValue">-</span>
+      <span *ngIf="recentValue">{{ recentValue | number }}</span>
+    </h3>
+  </div>
+</div>

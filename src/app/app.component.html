@@ -1,1 +1,25 @@
-<router-outlet></router-outlet>
+<div class="container-fluid no-padding">
+
+  <ss-title
+    game-name="Donkey Kong"
+    category="Any% Default Settings">
+  </ss-title>
+
+  <ss-splits-list
+    [current-run]="currentRun"
+    [split-displays]="splitDisplays">
+  </ss-splits-list>
+
+  <ss-most-recent-split-value
+    [recent-value]="recentValue">
+  </ss-most-recent-split-value>
+
+  <ss-deaths [deaths]="currentRun.deaths"></ss-deaths>
+  <ss-pace
+    [current-run]="currentRun"
+    [split-displays]="splitDisplays">
+  </ss-pace>
+
+  <ss-manual-input></ss-manual-input>
+  <!-- <ss-game-vision-input driver="donkey-kong"></ss-game-vision-input> -->
+</div>

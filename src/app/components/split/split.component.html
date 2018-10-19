@@ -1,0 +1,15 @@
+<div
+  class="row splits--split"
+  [ngClass]="{
+    'splits--split__current': isCurrent,
+    'splits--split__alt': isAlternating,
+    'splits--split__final': isFinal,
+    'splits--subsplit': isSubsplit
+  }">
+  <div class="col-5"><span>{{ mainLabel }}</span></div>
+  <div class="col-3 text-right">{{ columnOneValue | number }}</div>
+  <div class="col-4 text-right">
+    <span *ngIf="!columnTwoValue">-</span>
+    <span *ngIf="columnTwoValue">{{ columnTwoValue | number }}</span>
+  </div>
+</div>

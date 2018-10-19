@@ -1,0 +1,8 @@
+<div class="row pace--row">
+  <div class="col-5">Pace</div>
+  <div class="col-3 text-right"></div>
+  <div class="col-4 text-right">
+    <span *ngIf="!currentPace">-</span>
+    <span *ngIf="currentPace">{{ currentPace | number }}</span>
+  </div>
+</div>

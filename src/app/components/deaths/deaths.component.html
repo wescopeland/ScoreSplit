@@ -1,0 +1,8 @@
+<div class="row deaths--row">
+  <div class="col-5">Deaths ({{ deaths.length }})</div>
+  <div class="col-3 text-right"></div>
+  <div class="col-4 text-right">
+    <span *ngIf="!getSumOfDeaths(deaths)">-</span>
+    <span *ngIf="getSumOfDeaths(deaths)">{{ getSumOfDeaths(deaths) | number }}</span>
+  </div>
+</div>

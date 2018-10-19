@@ -1,0 +1,12 @@
+<div class="title">
+  <div
+    *ngIf="gameName"
+    class="row justify-content-center title--game-name">
+    <h6>{{ gameName }}</h6>
+  </div>
+  <div
+    *ngIf="category"
+    class="row justify-content-center title--category">
+    <label>{{ category }}</label>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div
+  id="splits-list"
+  class="splits"
+  (mousewheel)="onScroll($event)"
+  style="min-height: 300px; height: 300px; overflow: hidden;">
+
+  <div *ngFor="let splitDisplay of splitDisplays; last as isLast">
+    <div *ngIf="!isLast">
+      <ss-split
+        [main-label]="splitDisplay.mainLabel"
+        [is-done]="splitDisplay.isDone"
+        [is-current]="splitDisplay.id === currentRun.currentSplitId"
+        [is-alternating]="splitDisplay.isAlternating"
+        [column-one-value]="currentRun.splitFinishes[splitDisplay.id]"
+        [column-two-value]="currentRun.sumTable[splitDisplay.id]">
+      </ss-split>
+
+      <div *ngIf="getIfAnySubsplitIsActive(splitDisplay, currentRun)">
+        <div *ngFor="let subsplit of splitDisplay.subsplits; last as lastSubsplit">
+          <ss-split
+            [ngClass]="{ 'last-subsplit': lastSubsplit }"
+            [main-label]="subsplit.mainLabel"
+            [is-subsplit]="true"
+            [is-done]="subsplit.isDone"
+            [is-current]="subsplit.id === currentRun.currentSplitId"
+            [is-alternating]="subsplit.isAlternating"
+            [column-one-value]="currentRun.splitFinishes[subsplit.id]"
+            [column-two-value]="currentRun.sumTable[subsplit.id]">
+          </ss-split>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="splits final-split">
+  <ss-split
+    [main-label]="splitDisplays[splitDisplays.length-1].mainLabel"
+    [is-done]="splitDisplays[splitDisplays.length-1].isDone"
+    [is-current]="splitDisplays[splitDisplays.length-1].id === currentRun.currentSplitId"
+    [is-alternating]="splitDisplays[splitDisplays.length-1].isAlternating"
+    [is-final]="true"
+    [column-one-value]="currentRun.splitFinishes[splitDisplays[splitDisplays.length-1].id]"
+    [column-two-value]="currentRun.sumTable[splitDisplays[splitDisplays.length-1].id]">
+  </ss-split>
+</div>

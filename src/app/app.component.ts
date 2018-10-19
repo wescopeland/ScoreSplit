@@ -1,26 +1,56 @@
-import { Component } from '@angular/core';
-import { ElectronService } from './providers/electron.service';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConfig } from '../environments/environment';
+import { Component } from "@angular/core";
+import { Subscription } from "rxjs";
+
+import { ScoresplitStateService } from "./state/state.service";
+import { ScoresplitMessengerService } from "./messenger/messenger.service";
+import { Split } from "./state/models/split.model";
+import { SplitDisplay } from "./state/models/split-display.model";
+import { Run } from "./state/models/run.model";
+
+import { donkeyKongSplits } from "./state/demo/donkey-kong.splits";
+import { pacManSplits } from "./state/demo/pac-man.splits";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"]
 })
 export class AppComponent {
-  constructor(public electronService: ElectronService,
-    private translate: TranslateService) {
+  public currentRun: Run;
+  public recentValue: number;
+  public splitDisplays: SplitDisplay[];
+  public splits: Split[];
 
-    translate.setDefaultLang('en');
-    console.log('AppConfig', AppConfig);
+  private _subscription: Subscription;
 
-    if (electronService.isElectron()) {
-      console.log('Mode electron');
-      console.log('Electron ipcRenderer', electronService.ipcRenderer);
-      console.log('NodeJS childProcess', electronService.childProcess);
-    } else {
-      console.log('Mode web');
-    }
+  constructor(
+    private _state: ScoresplitStateService,
+    private _messenger: ScoresplitMessengerService
+  ) {
+    this.splits = donkeyKongSplits;
+    this.splitDisplays = this._state.generateSplitDisplays(this.splits);
+    this.currentRun = this._state.beginRun(this.splitDisplays);
+
+    console.log(this.splitDisplays);
+    console.log(this.currentRun);
+
+    this._subscription = this._messenger.getMessages().subscribe(e => {
+      if (e.header === "SPLIT") {
+        this.recentValue = e.message;
+        this.currentRun = {
+          ...this._state.split(e.message, this.currentRun, this.splitDisplays)
+        };
+      }
+
+      if (e.header === "DEATH") {
+        this.currentRun = {
+          ...this._state.addDeath(
+            e.message,
+            this.currentRun,
+            this.splitDisplays
+          )
+        };
+      }
+    });
   }
 }
