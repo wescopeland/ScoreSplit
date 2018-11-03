@@ -1,0 +1,8 @@
+<div class="row sum-of-best--row">
+  <div class="col-5">Sum of Best</div>
+  <div class="col-3 text-right"></div>
+  <div class="col-4 text-right">
+    <span *ngIf="!sumOfBest">-</span>
+    <span *ngIf="sumOfBest">{{ sumOfBest | number }}</span>
+  </div>
+</div>

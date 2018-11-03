@@ -1,12 +1,14 @@
 <div class="container-fluid no-padding">
 
   <ss-title
-    game-name="Donkey Kong"
-    category="Any% Default Settings">
+    [game-name]="currentSplitArchive.title"
+    [category]="currentSplitArchive.category"
+    [attempt-count]="currentSplitArchive.attemptCount">
   </ss-title>
 
   <ss-splits-list
     [current-run]="currentRun"
+    [current-split-archive]="currentSplitArchive"
     [split-displays]="splitDisplays">
   </ss-splits-list>
 
@@ -15,6 +17,13 @@
   </ss-most-recent-split-value>
 
   <ss-deaths [deaths]="currentRun.deaths"></ss-deaths>
+  <ss-bonuses [bonuses]="currentRun.bonuses"></ss-bonuses>
+  <ss-sum-of-best
+    [current-run]="currentRun"
+    [current-split-archive]="currentSplitArchive"
+    [current-split-displays]="splitDisplays"
+    [max-life-count]="splitSet.maxLives">
+  </ss-sum-of-best>
   <ss-pace
     [current-run]="currentRun"
     [split-displays]="splitDisplays">
@@ -22,4 +31,6 @@
 
   <ss-manual-input></ss-manual-input>
   <!-- <ss-game-vision-input driver="donkey-kong"></ss-game-vision-input> -->
+
+  <ss-reset-button (reset-run)="handleResetRun()"></ss-reset-button>
 </div>

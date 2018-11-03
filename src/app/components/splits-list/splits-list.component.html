@@ -4,6 +4,13 @@
   (mousewheel)="onScroll($event)"
   style="min-height: 300px; height: 300px; overflow: hidden;">
 
+  <div class="row column-headers--row">
+    <div class="col"></div>
+    <div *ngIf="layout.columnThreeValue" class="col text-right">{{ getColumnHeaderLabel(layout.columnThreeValue) }}</div>
+    <div *ngIf="layout.columnTwoValue" class="col text-right">{{ getColumnHeaderLabel(layout.columnTwoValue) }}</div>
+    <div class="col text-right">{{ getColumnHeaderLabel(layout.columnOneValue) }}</div>
+  </div>
+
   <div *ngFor="let splitDisplay of splitDisplays; last as isLast">
     <div *ngIf="!isLast">
       <ss-split
@@ -11,8 +18,10 @@
         [is-done]="splitDisplay.isDone"
         [is-current]="splitDisplay.id === currentRun.currentSplitId"
         [is-alternating]="splitDisplay.isAlternating"
-        [column-one-value]="currentRun.splitFinishes[splitDisplay.id]"
-        [column-two-value]="currentRun.sumTable[splitDisplay.id]">
+        [current-maximum-value]="splitMaximums[splitDisplay.id]"
+        [column-one-value]="getColumnValue(layout.columnOneValue, currentRun, splitDisplay.id)"
+        [column-two-value]="getColumnValue(layout.columnTwoValue, currentRun, splitDisplay.id)"
+        [column-three-value]="getColumnValue(layout.columnThreeValue, currentRun, splitDisplay.id)">
       </ss-split>
 
       <div *ngIf="getIfAnySubsplitIsActive(splitDisplay, currentRun)">
@@ -24,8 +33,10 @@
             [is-done]="subsplit.isDone"
             [is-current]="subsplit.id === currentRun.currentSplitId"
             [is-alternating]="subsplit.isAlternating"
-            [column-one-value]="currentRun.splitFinishes[subsplit.id]"
-            [column-two-value]="currentRun.sumTable[subsplit.id]">
+            [current-maximum-value]="splitMaximums[subsplit.id]"
+            [column-one-value]="getColumnValue(layout.columnOneValue, currentRun, subsplit.id)"
+            [column-two-value]="getColumnValue(layout.columnTwoValue, currentRun, subsplit.id)"
+            [column-three-value]="getColumnValue(layout.columnThreeValue, currentRun, subsplit.id)">
           </ss-split>
         </div>
       </div>

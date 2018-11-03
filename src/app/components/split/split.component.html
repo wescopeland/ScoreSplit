@@ -6,10 +6,49 @@
     'splits--split__final': isFinal,
     'splits--subsplit': isSubsplit
   }">
-  <div class="col-5"><span>{{ mainLabel }}</span></div>
-  <div class="col-3 text-right">{{ columnOneValue | number }}</div>
-  <div class="col-4 text-right">
-    <span *ngIf="!columnTwoValue">-</span>
-    <span *ngIf="columnTwoValue">{{ columnTwoValue | number }}</span>
+  <div class="col"><span>{{ mainLabel }}</span></div>
+  <div
+    *ngIf="columnThreeValue"
+    class="col text-right"
+    [ngClass]="{
+      'gold': columnThreeValue.color === 'gold',
+      'light-green': columnThreeValue.color === 'light-green',
+      'green': columnThreeValue.color === 'green',
+      'strong-green': columnThreeValue.color === 'strong-green',
+      'light-red': columnThreeValue.color === 'light-red',
+      'red': columnThreeValue.color === 'red',
+      'strong-red': columnThreeValue.color === 'strong-red'
+    }">
+    <span *ngIf="columnThreeValue">
+      <span *ngIf="columnThreeValue.color && columnThreeValue.hasDesignator">{{ getColorSymbol(columnThreeValue.color) }}</span>{{ columnThreeValue.value }}
+    </span>
+  </div>
+  <div
+    *ngIf="columnTwoValue"
+    class="col text-right"
+    [ngClass]="{
+      'gold': columnTwoValue.color === 'gold',
+      'light-green': columnTwoValue.color === 'light-green',
+      'green': columnTwoValue.color === 'green',
+      'strong-green': columnTwoValue.color === 'strong-green',
+      'light-red': columnTwoValue.color === 'light-red',
+      'red': columnTwoValue.color === 'red',
+      'strong-red': columnTwoValue.color === 'strong-red'
+    }">
+    <span *ngIf="columnTwoValue">{{ columnTwoValue.value }}</span>
+  </div>
+  <div
+    class="col text-right"
+    [ngClass]="{
+      'gold': columnOneValue && columnOneValue.color === 'gold',
+      'light-green': columnOneValue && columnOneValue.color === 'light-green',
+      'green': columnOneValue && columnOneValue.color === 'green',
+      'strong-green': columnOneValue && columnOneValue.color === 'strong-green',
+      'light-red': columnOneValue && columnOneValue.color === 'light-red',
+      'red': columnOneValue && columnOneValue.color === 'red',
+      'strong-red': columnOneValue && columnOneValue.color === 'strong-red'
+    }">
+    <span *ngIf="columnOneValue && !columnOneValue.value" style="float: right;">-</span>
+    <span *ngIf="columnOneValue">{{ columnOneValue.value }}</span>
   </div>
 </div>

@@ -1,0 +1,8 @@
+<div class="row bonuses--row">
+  <div class="col-5">Bonuses ({{ bonuses.length }})</div>
+  <div class="col-3 text-right"></div>
+  <div class="col-4 text-right">
+    <span *ngIf="!getSumOfBonuses(bonuses)">-</span>
+    <span *ngIf="getSumOfBonuses(bonuses)">{{ getSumOfBonuses(bonuses) | number }}</span>
+  </div>
+</div>

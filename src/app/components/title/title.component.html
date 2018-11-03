@@ -2,7 +2,12 @@
   <div
     *ngIf="gameName"
     class="row justify-content-center title--game-name">
-    <h6>{{ gameName }}</h6>
+    <h6>
+      {{ gameName }}
+    </h6>
+    <span *ngIf="attemptCount !== null" class="title--attempts">
+      {{ attemptCount }}
+    </span>
   </div>
   <div
     *ngIf="category"

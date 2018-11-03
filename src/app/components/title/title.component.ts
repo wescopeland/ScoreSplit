@@ -6,6 +6,7 @@ import { Component, OnInit, Input } from "@angular/core";
   styleUrls: ["./title.component.scss"]
 })
 export class TitleComponent implements OnInit {
+  @Input("attempt-count") attemptCount: number;
   @Input("game-name") gameName: string;
   @Input("category") category: string;
 

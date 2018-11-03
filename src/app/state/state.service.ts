@@ -1,26 +1,24 @@
-import { Injectable } from "@angular/core";
-import * as leftPad from "left-pad";
+import { Injectable } from '@angular/core';
+import * as leftPad from 'left-pad';
 
-import { Run } from "./models/run.model";
-import { SplitDisplay } from "./models/split-display.model";
-import { Split } from "./models/split.model";
-import { Death } from "./models/death.model";
+import { Run } from './models/run.model';
+import { SplitDisplay } from './models/split-display.model';
+import { Split } from './models/split.model';
+import { SplitArchive } from './models/split-archive.model';
+import { Death } from './models/death.model';
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class ScoresplitStateService {
   private _lastEnteredScore: number;
 
   constructor() {}
 
-  private _convertLabelMaskToLabel(
-    labelMask: string,
-    iteration: number
-  ): string {
-    let sigfigCount = labelMask.split("$").length - 1;
+  private _convertLabelMaskToLabel(labelMask: string, iteration: number): string {
+    let sigfigCount = labelMask.split('$').length - 1;
 
-    let splitter: string = "";
+    let splitter: string = '';
     for (let i = 0; i < sigfigCount; i += 1) {
-      splitter += "$";
+      splitter += '$';
     }
 
     let injection = leftPad(iteration, sigfigCount, 0);
@@ -32,7 +30,27 @@ export class ScoresplitStateService {
       }
     }
 
-    return splitMask.join("");
+    return splitMask.join('');
+  }
+
+  addBonus(val: number, currentRun: Run): Run {
+    let modifiedRun = currentRun;
+    let diffValue = 0;
+    let mostRecentBonusSum = 0;
+
+    if (this._lastEnteredScore) {
+      diffValue = val - this._lastEnteredScore;
+    } else {
+      diffValue = val;
+    }
+
+    modifiedRun.bonuses.push({
+      diffValue: diffValue,
+      sumValue: val
+    });
+
+    this._lastEnteredScore = val;
+    return modifiedRun;
   }
 
   addDeath(val: number, currentRun: Run, splitDisplays: SplitDisplay[]): Run {
@@ -81,6 +99,7 @@ export class ScoresplitStateService {
         currentSplitId: splitDisplays[0].id,
         splitFinishes: [],
         deaths: [],
+        bonuses: [],
         likenesses: []
       };
     } else {
@@ -88,6 +107,7 @@ export class ScoresplitStateService {
         currentSplitId: splitDisplays[0].subsplits[0].id,
         splitFinishes: [],
         deaths: [],
+        bonuses: [],
         likenesses: []
       };
     }
@@ -224,10 +244,7 @@ export class ScoresplitStateService {
     return newSplitDisplays;
   }
 
-  getCurrentSplitDisplay(
-    currentSplitId: number,
-    splitDisplays: SplitDisplay[]
-  ): SplitDisplay {
+  getCurrentSplitDisplay(currentSplitId: number, splitDisplays: SplitDisplay[]): SplitDisplay {
     let current: SplitDisplay;
     splitDisplays.forEach(splitDisplay => {
       if (splitDisplay.id === currentSplitId) {
@@ -250,7 +267,7 @@ export class ScoresplitStateService {
     let ids = [];
 
     splitDisplays.forEach(splitDisplay => {
-      if (!splitDisplay.hasOwnProperty("repeatGroup")) {
+      if (!splitDisplay.hasOwnProperty('repeatGroup')) {
         ids.push(splitDisplay.id);
       }
     });
@@ -265,7 +282,7 @@ export class ScoresplitStateService {
     let currentGroupIds = [];
 
     splitDisplays.forEach(splitDisplay => {
-      if (splitDisplay.hasOwnProperty("repeatGroup")) {
+      if (splitDisplay.hasOwnProperty('repeatGroup')) {
         if (splitDisplay.repeatGroup === currentRepeatGroup) {
           currentGroupIds.push(splitDisplay.id);
         } else {
@@ -286,17 +303,11 @@ export class ScoresplitStateService {
     return ids;
   }
 
-  getAllSubsplitGroupsByGroupId(
-    groupId: number,
-    splitDisplays: SplitDisplay[]
-  ): number[][] {
+  getAllSubsplitGroupsByGroupId(groupId: number, splitDisplays: SplitDisplay[]): number[][] {
     let ids: number[][] = [];
 
     splitDisplays.forEach(splitDisplay => {
-      if (
-        splitDisplay.hasOwnProperty("repeatGroup") &&
-        splitDisplay.repeatGroup === groupId
-      ) {
+      if (splitDisplay.hasOwnProperty('repeatGroup') && splitDisplay.repeatGroup === groupId) {
         if (splitDisplay.subsplits && splitDisplay.subsplits.length) {
           let subsplitIds = [];
           splitDisplay.subsplits.forEach(subsplit => {
@@ -331,18 +342,11 @@ export class ScoresplitStateService {
     return split;
   }
 
-  getSubsplitsByParentId(
-    id: number,
-    splitDisplays: SplitDisplay[]
-  ): SplitDisplay[] {
+  getSubsplitsByParentId(id: number, splitDisplays: SplitDisplay[]): SplitDisplay[] {
     let subsplits: SplitDisplay[];
 
     splitDisplays.forEach(splitDisplay => {
-      if (
-        splitDisplay.id === id &&
-        splitDisplay.subsplits &&
-        splitDisplay.subsplits.length
-      ) {
+      if (splitDisplay.id === id && splitDisplay.subsplits && splitDisplay.subsplits.length) {
         subsplits = splitDisplay.subsplits;
       }
     });
@@ -350,10 +354,7 @@ export class ScoresplitStateService {
     return subsplits;
   }
 
-  getParentBySubsplitId(
-    id: number,
-    splitDisplays: SplitDisplay[]
-  ): SplitDisplay {
+  getParentBySubsplitId(id: number, splitDisplays: SplitDisplay[]): SplitDisplay {
     let parent: SplitDisplay;
 
     splitDisplays.forEach(splitDisplay => {
@@ -381,12 +382,23 @@ export class ScoresplitStateService {
     return deathPoints;
   }
 
+  restart() {
+    this._lastEnteredScore = null;
+  }
+
+  updateSplitArchive(currentRun: Run, currentSplits: Split[], currentSplitArchive: SplitArchive) {
+    let modifiedArchive = { ...currentSplitArchive };
+
+    modifiedArchive.attemptCount += 1;
+    modifiedArchive.runs.push(currentRun);
+    modifiedArchive.splits = currentSplits;
+
+    return modifiedArchive;
+  }
+
   split(val: number, currentRun: Run, splitDisplays: SplitDisplay[]): Run {
     let modifiedRun = currentRun;
-    let currentSplit = this.getCurrentSplitDisplay(
-      modifiedRun.currentSplitId,
-      splitDisplays
-    );
+    let currentSplit = this.getCurrentSplitDisplay(modifiedRun.currentSplitId, splitDisplays);
 
     // Get the difference from the last entered value.
     if (this._lastEnteredScore) {
@@ -396,8 +408,7 @@ export class ScoresplitStateService {
         this.getDeathPointsBySplitId(modifiedRun.currentSplitId, modifiedRun);
     } else {
       modifiedRun.splitFinishes[modifiedRun.currentSplitId] =
-        val -
-        this.getDeathPointsBySplitId(modifiedRun.currentSplitId, modifiedRun);
+        val - this.getDeathPointsBySplitId(modifiedRun.currentSplitId, modifiedRun);
     }
 
     modifiedRun.sumTable[modifiedRun.currentSplitId] = val;
@@ -429,10 +440,7 @@ export class ScoresplitStateService {
 
     // If it's a subsplit, we need to find its parent.
     if (currentSplit.isSubsplit) {
-      let parent = this.getParentBySubsplitId(
-        modifiedRun.currentSplitId,
-        splitDisplays
-      );
+      let parent = this.getParentBySubsplitId(modifiedRun.currentSplitId, splitDisplays);
 
       let subsplitValueSum = 0;
       parent.subsplits.forEach(subsplit => {

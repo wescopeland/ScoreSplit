@@ -1,4 +1,5 @@
-import { Death } from "./death.model";
+import { Death } from './death.model';
+import { Bonus } from './bonus.model';
 
 export interface Run {
   currentSplitId: number;
@@ -11,4 +12,5 @@ export interface Run {
   }>;
   sumTable?: number[];
   deaths?: Death[];
+  bonuses?: Bonus[];
 }
