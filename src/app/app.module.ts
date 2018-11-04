@@ -14,6 +14,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppComponent } from './app.component';
+import { ContextMenuComponent } from './context-menu/context-menu.component';
 import { TitleComponent } from './components/title/title.component';
 import { SplitsListComponent } from './components/splits-list/splits-list.component';
 import { SplitComponent } from './components/split/split.component';
@@ -34,6 +35,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
+    ContextMenuComponent,
     TitleComponent,
     SplitsListComponent,
     SplitComponent,

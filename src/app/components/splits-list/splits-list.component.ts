@@ -55,8 +55,6 @@ export class SplitsListComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(e: SimpleChanges) {
-    this.finalSplit = this.getFinalSplit(this.splitDisplays);
-
     setTimeout(() => {
       let element = document.getElementsByClassName('splits--split__current')[0];
 
@@ -87,7 +85,14 @@ export class SplitsListComponent implements OnInit, OnChanges {
     }, 0);
 
     if (e.currentSplitArchive && !e.currentSplitArchive.firstChange) {
+      this.finalSplit = this.getFinalSplit(this.splitDisplays);
       this.splitMaximums = this.getSplitMaximums(this.currentSplitArchive.runs);
+      this.pbRun = this.getPbRun(this.currentSplitArchive.runs);
+
+      if (this.pbRun) {
+        this.pbSplitSegmentValues = this.pbRun.splitFinishes;
+        this.pbSplitSumValues = this.pbRun.sumTable;
+      }
     }
   }
 

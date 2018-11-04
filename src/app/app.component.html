@@ -1,3 +1,10 @@
+<ss-context-menu
+  [current-run]="currentRun"
+  [current-split-archive]="currentSplitArchive"
+  (opened-split-archive)="handleOpenedSplitArchive($event)"
+  (reset-run)="handleResetRun()">
+</ss-context-menu>
+
 <div class="container-fluid no-padding">
 
   <ss-title
@@ -29,6 +36,4 @@
 
   <ss-manual-input></ss-manual-input>
   <!-- <ss-game-vision-input driver="donkey-kong"></ss-game-vision-input> -->
-
-  <ss-reset-button (reset-run)="handleResetRun()"></ss-reset-button>
 </div>

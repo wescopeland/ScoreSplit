@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { ContextMenu } from './context-menu/context-menu.service';
 import { ScoresplitStateService } from './state/service/state.service';
 import { ScoresplitMessengerService } from './messenger/messenger.service';
 import { SplitArchive } from './state/models/split-archive.model';
@@ -29,18 +28,27 @@ export class AppComponent implements OnInit {
   private _subscription: Subscription;
 
   constructor(
-    private _contextMenu: ContextMenu,
+    private _cd: ChangeDetectorRef,
     private _state: ScoresplitStateService,
     private _messenger: ScoresplitMessengerService
-  ) {
+  ) {}
+
+  ngOnInit() {
+    this.activate();
+    this.initializeMessageSubscriptions();
+  }
+
+  activate() {
     this.splitSet = donkeyKongSplits;
     this.splitDisplays = this._state.generateSplitDisplays(this.splitSet.splits);
     this.currentRun = this._state.beginRun(this.splitDisplays);
+    this.recentValue = null;
 
     console.log(this.splitDisplays);
     console.log(this.currentRun);
 
-    this.currentSplitArchive = DkPbSplitArchive;
+    console.log(this.currentSplitArchive);
+
     if (!this.currentSplitArchive) {
       this.currentSplitArchive = {
         splits: this.splitSet.splits,
@@ -49,12 +57,16 @@ export class AppComponent implements OnInit {
         category: 'Any% Default Settings',
         attemptCount: 0
       };
-    } else {
     }
   }
 
-  ngOnInit() {
-    this.initializeMessageSubscriptions();
+  handleOpenedSplitArchive(archive: SplitArchive): void {
+    this.currentSplitArchive = archive;
+
+    this._state.restart();
+    this.activate();
+
+    this._cd.detectChanges();
   }
 
   handleResetRun(): void {
