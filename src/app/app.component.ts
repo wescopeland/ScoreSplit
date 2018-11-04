@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { ScoresplitStateService } from './state/state.service';
+import { ContextMenu } from './context-menu/context-menu.service';
+import { ScoresplitStateService } from './state/service/state.service';
 import { ScoresplitMessengerService } from './messenger/messenger.service';
 import { SplitArchive } from './state/models/split-archive.model';
 import { Split } from './state/models/split.model';
@@ -10,6 +11,7 @@ import { Run } from './state/models/run.model';
 
 import { DkPbSplitArchive } from './state/demo/dk-pb.split-archive';
 import { donkeyKongSplits } from './state/demo/donkey-kong.splits';
+import { donkeyKongRemixSplits } from './state/demo/donkey-kong-remix.splits';
 import { pacManSplits } from './state/demo/pac-man.splits';
 
 @Component({
@@ -27,6 +29,7 @@ export class AppComponent implements OnInit {
   private _subscription: Subscription;
 
   constructor(
+    private _contextMenu: ContextMenu,
     private _state: ScoresplitStateService,
     private _messenger: ScoresplitMessengerService
   ) {
@@ -37,12 +40,12 @@ export class AppComponent implements OnInit {
     console.log(this.splitDisplays);
     console.log(this.currentRun);
 
-    // this.currentSplitArchive = DkPbSplitArchive;
+    this.currentSplitArchive = DkPbSplitArchive;
     if (!this.currentSplitArchive) {
       this.currentSplitArchive = {
         splits: this.splitSet.splits,
         runs: [],
-        title: 'Donkey Kong',
+        title: 'Donkey Kong Spooky Remix',
         category: 'Any% Default Settings',
         attemptCount: 0
       };

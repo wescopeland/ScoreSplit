@@ -4,7 +4,7 @@
   (mousewheel)="onScroll($event)"
   style="min-height: 300px; height: 300px; overflow: hidden;">
 
-  <div class="row column-headers--row">
+  <div class="row column-headers--row sticky-top">
     <div class="col"></div>
     <div *ngIf="layout.columnThreeValue" class="col text-right">{{ getColumnHeaderLabel(layout.columnThreeValue) }}</div>
     <div *ngIf="layout.columnTwoValue" class="col text-right">{{ getColumnHeaderLabel(layout.columnTwoValue) }}</div>
@@ -12,7 +12,7 @@
   </div>
 
   <div *ngFor="let splitDisplay of splitDisplays; last as isLast">
-    <div *ngIf="!isLast">
+    <div *ngIf="(splitDisplay.subsplits) || (!splitDisplay.subsplits && !isLast)">
       <ss-split
         [main-label]="splitDisplay.mainLabel"
         [is-done]="splitDisplay.isDone"
@@ -27,6 +27,7 @@
       <div *ngIf="getIfAnySubsplitIsActive(splitDisplay, currentRun)">
         <div *ngFor="let subsplit of splitDisplay.subsplits; last as lastSubsplit">
           <ss-split
+            *ngIf="!isLast || (isLast && splitDisplay.subsplits && !lastSubsplit)"
             [ngClass]="{ 'last-subsplit': lastSubsplit }"
             [main-label]="subsplit.mainLabel"
             [is-subsplit]="true"
@@ -47,12 +48,14 @@
 
 <div class="splits final-split">
   <ss-split
-    [main-label]="splitDisplays[splitDisplays.length-1].mainLabel"
-    [is-done]="splitDisplays[splitDisplays.length-1].isDone"
-    [is-current]="splitDisplays[splitDisplays.length-1].id === currentRun.currentSplitId"
-    [is-alternating]="splitDisplays[splitDisplays.length-1].isAlternating"
+    [main-label]="finalSplit.mainLabel"
+    [is-done]="finalSplit.isDone"
+    [is-current]="finalSplit.id === currentRun.currentSplitId"
+    [is-alternating]="finalSplit.isAlternating"
     [is-final]="true"
-    [column-one-value]="currentRun.splitFinishes[splitDisplays[splitDisplays.length-1].id]"
-    [column-two-value]="currentRun.sumTable[splitDisplays[splitDisplays.length-1].id]">
+    [is-subsplit]="finalSplit.isSubsplit && getIfFinalParentHasActiveSubsplits(getParentBySubsplitId(finalSplit.id, splitDisplays), currentRun)"
+    [column-one-value]="getColumnValue(layout.columnOneValue, currentRun, finalSplit.id)"
+    [column-two-value]="getColumnValue(layout.columnTwoValue, currentRun, finalSplit.id)"
+    [column-three-value]="getColumnValue(layout.columnThreeValue, currentRun, finalSplit.id)">
   </ss-split>
 </div>

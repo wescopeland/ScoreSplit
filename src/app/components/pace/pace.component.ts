@@ -1,25 +1,19 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  OnChanges,
-  SimpleChanges
-} from "@angular/core";
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
-import { Run } from "../../state/models/run.model";
-import { Death } from "../../state/models/death.model";
-import { SplitDisplay } from "../../state/models/split-display.model";
+import { Run } from '../../state/models/run.model';
+import { Death } from '../../state/models/death.model';
+import { SplitDisplay } from '../../state/models/split-display.model';
 
-import { ScoresplitStateService } from "../../state/state.service";
+import { ScoresplitStateService } from '../../state/service/state.service';
 
 @Component({
-  selector: "ss-pace",
-  templateUrl: "./pace.component.html",
-  styleUrls: ["./pace.component.scss"]
+  selector: 'ss-pace',
+  templateUrl: './pace.component.html',
+  styleUrls: ['./pace.component.scss']
 })
 export class PaceComponent implements OnInit, OnChanges {
-  @Input("current-run") currentRun: Run;
-  @Input("split-displays") splitDisplays: SplitDisplay[];
+  @Input('current-run') currentRun: Run;
+  @Input('split-displays') splitDisplays: SplitDisplay[];
 
   public currentPace: number;
 
@@ -48,10 +42,7 @@ export class PaceComponent implements OnInit, OnChanges {
 
     let repeatGroupIndex = null;
     splitDisplays.forEach((splitDisplay, index) => {
-      if (
-        splitDisplay.repeatGroup !== null &&
-        splitDisplay.repeatGroup !== undefined
-      ) {
+      if (splitDisplay.repeatGroup !== null && splitDisplay.repeatGroup !== undefined) {
         repeatGroupIndex = index;
       }
     });
@@ -68,9 +59,7 @@ export class PaceComponent implements OnInit, OnChanges {
 
     likenesses.forEach(likeness => {
       average +=
-        (likeness.sum / likeness.count) *
-        subsplitGroups.length *
-        appearances[likeness.label];
+        (likeness.sum / likeness.count) * subsplitGroups.length * appearances[likeness.label];
     });
 
     return average;
@@ -126,10 +115,7 @@ export class PaceComponent implements OnInit, OnChanges {
     return averageValue;
   }
 
-  getScoresOfSubsplitGroups(
-    subsplitGroups: number[][],
-    currentRun: Run
-  ): number[][] {
+  getScoresOfSubsplitGroups(subsplitGroups: number[][], currentRun: Run): number[][] {
     let allGroupScores: number[][] = [];
 
     subsplitGroups.forEach(group => {
@@ -180,15 +166,9 @@ export class PaceComponent implements OnInit, OnChanges {
     let averageSets: number[] = [];
     let rawSubsplitScores: any;
     repeatGroups.forEach((group, groupId) => {
-      let subsplitGroups = this._state.getAllSubsplitGroupsByGroupId(
-        groupId,
-        splitDisplays
-      );
+      let subsplitGroups = this._state.getAllSubsplitGroupsByGroupId(groupId, splitDisplays);
 
-      rawSubsplitScores = this.getScoresOfSubsplitGroups(
-        subsplitGroups,
-        currentRun
-      );
+      rawSubsplitScores = this.getScoresOfSubsplitGroups(subsplitGroups, currentRun);
 
       averageSets.push(this.getSubsplitAverage(rawSubsplitScores));
     });

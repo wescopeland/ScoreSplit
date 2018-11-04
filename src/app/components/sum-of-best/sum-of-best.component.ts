@@ -14,7 +14,6 @@ export class SumOfBestComponent implements OnInit, OnChanges {
   @Input('current-run') currentRun: Run;
   @Input('current-split-archive') currentSplitArchive: SplitArchive;
   @Input('current-split-displays') currentSplitDisplays: SplitDisplay[];
-  @Input('max-life-count') maxLifeCount: number;
 
   public sumOfBest: number = null;
 
@@ -42,18 +41,45 @@ export class SumOfBestComponent implements OnInit, OnChanges {
     splitDisplays: SplitDisplay[]
   ): number {
     let sumOfBest = 0;
+    let bestBonuses: number[] = [];
     let bestDeaths: number[] = [];
     let bestFinishes: number[];
 
+    let maxBonusCount: number = 0;
     let maxLifeCount: number = 0;
 
     // Get the max number of lives used in a run.
-    if (!this.maxLifeCount) {
+    if (!maxLifeCount) {
       splitArchive.runs.forEach(run => {
         if (run.deaths && run.deaths.length && run.deaths.length > maxLifeCount) {
           maxLifeCount = run.deaths.length;
         }
       });
+
+      if (
+        currentRun.deaths &&
+        currentRun.deaths.length &&
+        currentRun.deaths.length > maxLifeCount
+      ) {
+        maxLifeCount = currentRun.deaths.length;
+      }
+    }
+
+    // Get the max number of bonuses used in a run.
+    if (!maxBonusCount) {
+      splitArchive.runs.forEach(run => {
+        if (run.bonuses && run.bonuses.length && run.bonuses.length > maxBonusCount) {
+          maxBonusCount = run.bonuses.length;
+        }
+      });
+
+      if (
+        currentRun.bonuses &&
+        currentRun.bonuses.length &&
+        currentRun.bonuses.length > maxBonusCount
+      ) {
+        maxBonusCount = currentRun.bonuses.length;
+      }
     }
 
     if (maxLifeCount !== null) {
@@ -73,7 +99,42 @@ export class SumOfBestComponent implements OnInit, OnChanges {
           }
         }
 
+        if (
+          currentRun.deaths &&
+          currentRun.deaths.length &&
+          currentRun.deaths[i] &&
+          currentRun.deaths[i].diffValue > currentBestDeath
+        ) {
+          currentBestDeath = currentRun.deaths[i].diffValue;
+        }
+
         bestDeaths.push(currentBestDeath);
+      }
+
+      // Get the highest scoring bonuses in the archive.
+      for (let i = 0; i < maxBonusCount; i += 1) {
+        let currentBestBonus = 0;
+        for (let j = 0; j < splitArchive.runs.length; j += 1) {
+          if (
+            splitArchive.runs[j].bonuses &&
+            splitArchive.runs[j].bonuses.length &&
+            splitArchive.runs[j].bonuses[i] &&
+            splitArchive.runs[j].bonuses[i].diffValue > currentBestBonus
+          ) {
+            currentBestBonus = splitArchive.runs[j].bonuses[i].diffValue;
+          }
+        }
+
+        if (
+          currentRun.bonuses &&
+          currentRun.bonuses.length &&
+          currentRun.bonuses[i] &&
+          currentRun.bonuses[i].diffValue > currentBestBonus
+        ) {
+          currentBestBonus = currentRun.bonuses[i].diffValue;
+        }
+
+        bestBonuses.push(currentBestBonus);
       }
     }
 
@@ -124,8 +185,6 @@ export class SumOfBestComponent implements OnInit, OnChanges {
       }
     });
 
-    console.log('bestFinishes', bestFinishes);
-
     bestFinishes.forEach(bestFinish => {
       sumOfBest += bestFinish;
     });
@@ -133,6 +192,12 @@ export class SumOfBestComponent implements OnInit, OnChanges {
     if (bestDeaths.length) {
       bestDeaths.forEach(bestDeath => {
         sumOfBest += bestDeath;
+      });
+    }
+
+    if (bestBonuses.length) {
+      bestBonuses.forEach(bestBonus => {
+        sumOfBest += bestBonus;
       });
     }
 

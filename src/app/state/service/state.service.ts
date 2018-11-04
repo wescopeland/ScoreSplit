@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import * as leftPad from 'left-pad';
 
-import { Run } from './models/run.model';
-import { SplitDisplay } from './models/split-display.model';
-import { Split } from './models/split.model';
-import { SplitArchive } from './models/split-archive.model';
-import { Death } from './models/death.model';
+import { Run } from '../models/run.model';
+import { SplitDisplay } from '../models/split-display.model';
+import { Split } from '../models/split.model';
+import { SplitArchive } from '../models/split-archive.model';
+import { Death } from '../models/death.model';
 
 @Injectable({ providedIn: 'root' })
 export class ScoresplitStateService {
@@ -392,6 +392,8 @@ export class ScoresplitStateService {
     modifiedArchive.attemptCount += 1;
     modifiedArchive.runs.push(currentRun);
     modifiedArchive.splits = currentSplits;
+
+    console.log(modifiedArchive);
 
     return modifiedArchive;
   }

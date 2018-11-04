@@ -17,12 +17,10 @@
   </ss-most-recent-split-value>
 
   <ss-deaths [deaths]="currentRun.deaths"></ss-deaths>
-  <ss-bonuses [bonuses]="currentRun.bonuses"></ss-bonuses>
   <ss-sum-of-best
     [current-run]="currentRun"
     [current-split-archive]="currentSplitArchive"
-    [current-split-displays]="splitDisplays"
-    [max-life-count]="splitSet.maxLives">
+    [current-split-displays]="splitDisplays">
   </ss-sum-of-best>
   <ss-pace
     [current-run]="currentRun"

@@ -1,7 +1,7 @@
 <div
   class="row splits--split"
   [ngClass]="{
-    'splits--split__current': isCurrent,
+    'splits--split__current': isCurrent && !columnOneValue.value,
     'splits--split__alt': isAlternating,
     'splits--split__final': isFinal,
     'splits--subsplit': isSubsplit

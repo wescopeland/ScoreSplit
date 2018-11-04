@@ -5,7 +5,7 @@ import * as leftPad from 'left-pad';
 
 import { SplitsListColumns, SplitsListLayout } from './splits-list.layout.model';
 import { ScoresplitMessengerService } from '../../messenger/messenger.service';
-import { ScoresplitStateService } from '../../state/state.service';
+import { ScoresplitStateService } from '../../state/service/state.service';
 import { Run } from '../../state/models/run.model';
 import { Split } from '../../state/models/split.model';
 import { SplitArchive } from '../../state/models/split-archive.model';
@@ -22,6 +22,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
   @Input('split-displays') splitDisplays: SplitDisplay[];
 
   public desiredVisibleSplits = 5;
+  public finalSplit: SplitDisplay;
   public splitMaximums: number[] = [];
   public pbSplitSegmentValues: number[] = [];
   public pbSplitSumValues: number[] = [];
@@ -31,8 +32,8 @@ export class SplitsListComponent implements OnInit, OnChanges {
   // TODO: This will eventually go into a separate layout file.
   public layout: SplitsListLayout = {
     columnOneValue: SplitsListColumns.Sum,
-    columnTwoValue: SplitsListColumns.SplitValue
-    // columnThreeValue: SplitsListColumns.VsPB
+    columnTwoValue: SplitsListColumns.SplitValue,
+    columnThreeValue: SplitsListColumns.VsPB
   };
 
   private _subscription: Subscription;
@@ -43,6 +44,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
+    this.finalSplit = this.getFinalSplit(this.splitDisplays);
     this.splitMaximums = this.getSplitMaximums(this.currentSplitArchive.runs);
     this.pbRun = this.getPbRun(this.currentSplitArchive.runs);
 
@@ -53,6 +55,8 @@ export class SplitsListComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(e: SimpleChanges) {
+    this.finalSplit = this.getFinalSplit(this.splitDisplays);
+
     setTimeout(() => {
       let element = document.getElementsByClassName('splits--split__current')[0];
 
@@ -87,6 +91,19 @@ export class SplitsListComponent implements OnInit, OnChanges {
     }
   }
 
+  getFinalSplit(splitDisplays: SplitDisplay[]): SplitDisplay {
+    let finalSplit: SplitDisplay;
+
+    let lastSplitDisplay = splitDisplays[splitDisplays.length - 1];
+
+    // Is the last split a subsplit? That would be the one to show if that's the case.
+    if (lastSplitDisplay.subsplits && lastSplitDisplay.subsplits.length) {
+      return lastSplitDisplay.subsplits[lastSplitDisplay.subsplits.length - 1];
+    } else {
+      return lastSplitDisplay;
+    }
+  }
+
   getDeathPointsUpToSplitId(run: Run, splitId: number): number {
     let deathPoints = 0;
 
@@ -117,6 +134,28 @@ export class SplitsListComponent implements OnInit, OnChanges {
     return label;
   }
 
+  getSplitDisplayBySplitId(id: number, splitDisplays: SplitDisplay[]): SplitDisplay {
+    return this._state.getCurrentSplitDisplay(id, splitDisplays);
+  }
+
+  getParentBySubsplitId(id: number, splitDisplays: SplitDisplay[]): SplitDisplay {
+    return this._state.getParentBySubsplitId(id, splitDisplays);
+  }
+
+  getIfFinalParentHasActiveSubsplits(splitDisplay: SplitDisplay, currentRun: Run): boolean {
+    let isActive = false;
+
+    if (splitDisplay.subsplits && splitDisplay.subsplits.length) {
+      splitDisplay.subsplits.forEach(subsplit => {
+        if (subsplit.id <= currentRun.currentSplitId) {
+          isActive = true;
+        }
+      });
+    }
+
+    return isActive;
+  }
+
   getColumnValue(valueType: SplitsListColumns, currentRun: Run, splitId: number): any {
     let selectedSplit = this._state.getCurrentSplitDisplay(splitId, this.splitDisplays);
     let currentSplit = this._state.getCurrentSplitDisplay(
@@ -124,13 +163,13 @@ export class SplitsListComponent implements OnInit, OnChanges {
       this.splitDisplays
     );
 
-    let isSubsplitOfParentActive = false;
+    let isParentOfSubsplitActive = false;
     if (
       selectedSplit !== currentSplit &&
       selectedSplit ===
         this._state.getParentBySubsplitId(currentRun.currentSplitId, this.splitDisplays)
     ) {
-      isSubsplitOfParentActive = true;
+      isParentOfSubsplitActive = true;
     }
 
     if (valueType === SplitsListColumns.Sum) {
@@ -163,7 +202,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
       }
 
       let value;
-      if (isSubsplitOfParentActive) {
+      if (isParentOfSubsplitActive) {
         color = 'neutral';
         value = currentRun.sumTable[splitId]
           ? '...' + formatNumber(currentRun.sumTable[splitId], 'en-US')
@@ -212,7 +251,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
       }
 
       let value;
-      if (isSubsplitOfParentActive) {
+      if (isParentOfSubsplitActive) {
         color = 'neutral';
         value = currentRun.splitFinishes[splitId]
           ? '...' + formatNumber(currentRun.splitFinishes[splitId], 'en-US')
@@ -229,7 +268,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
         hasDesignator: true
       };
     } else if (valueType === SplitsListColumns.VsPB) {
-      if (isSubsplitOfParentActive) {
+      if (isParentOfSubsplitActive) {
         return {
           value: null,
           color: 'neutral',
@@ -321,7 +360,6 @@ export class SplitsListComponent implements OnInit, OnChanges {
       });
     });
 
-    console.log('maximums', maximums);
     return maximums;
   }
 
@@ -378,8 +416,12 @@ export class SplitsListComponent implements OnInit, OnChanges {
   getIfElementVisible(element, percentX = 90, percentY = 90) {
     var tolerance = 0.01; //needed because the rects returned by getBoundingClientRect provide the position up to 10 decimals
 
-    var elementRect = element.getBoundingClientRect();
-    var parentRects = [];
+    try {
+      var elementRect = element.getBoundingClientRect();
+      var parentRects = [];
+    } catch (e) {
+      return true;
+    }
 
     while (element.parentElement != null) {
       parentRects.push(element.parentElement.getBoundingClientRect());
