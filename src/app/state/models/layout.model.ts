@@ -6,7 +6,8 @@ export enum LayoutElement {
   GameVisionInput,
   Deaths,
   Bonuses,
-  Pace
+  Pace,
+  MostRecentSplitValue
 }
 
 export interface Layout {

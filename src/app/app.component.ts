@@ -1,12 +1,14 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { ScoresplitStateService } from './state/service/state.service';
+import { ScoresplitSessionQuery } from './state/scoresplit-session.query';
 import { ScoresplitMessengerService } from './messenger/messenger.service';
 import { SplitArchive } from './state/models/split-archive.model';
 import { Split } from './state/models/split.model';
 import { SplitDisplay } from './state/models/split-display.model';
 import { Run } from './state/models/run.model';
+import { Layout, LayoutElement } from './state/models/layout.model';
 
 import { DkPbSplitArchive } from './state/demo/dk-pb.split-archive';
 import { donkeyKongSplits } from './state/demo/donkey-kong.splits';
@@ -21,6 +23,8 @@ import { pacManSplits } from './state/demo/pac-man.splits';
 export class AppComponent implements OnInit {
   public currentRun: Run;
   public currentSplitArchive: SplitArchive;
+  public isEditingLayout$ = this._sessionQuery.select(state => state.isEditingLayout);
+  public layout: Layout;
   public recentValue: number;
   public splitDisplays: SplitDisplay[];
   public splitSet: { maxLives: number; splits: Split[] };
@@ -30,8 +34,22 @@ export class AppComponent implements OnInit {
   constructor(
     private _cd: ChangeDetectorRef,
     private _state: ScoresplitStateService,
+    private _sessionQuery: ScoresplitSessionQuery,
     private _messenger: ScoresplitMessengerService
-  ) {}
+  ) {
+    this.layout = {
+      elements: [
+        LayoutElement.Title,
+        LayoutElement.SplitsList,
+        LayoutElement.MostRecentSplitValue,
+        LayoutElement.Bonuses,
+        LayoutElement.Deaths,
+        LayoutElement.SumOfBest,
+        LayoutElement.Pace,
+        LayoutElement.ManualInput
+      ]
+    };
+  }
 
   ngOnInit() {
     this.activate();
@@ -60,6 +78,44 @@ export class AppComponent implements OnInit {
     }
   }
 
+  getLayoutElement(element: LayoutElement): string {
+    let layoutElement = '';
+
+    if (element === LayoutElement.Bonuses) {
+      layoutElement = 'Bonuses';
+    }
+
+    if (element === LayoutElement.Deaths) {
+      layoutElement = 'Deaths';
+    }
+
+    if (element === LayoutElement.ManualInput) {
+      layoutElement = 'ManualInput';
+    }
+
+    if (element === LayoutElement.Pace) {
+      layoutElement = 'Pace';
+    }
+
+    if (element === LayoutElement.SplitsList) {
+      layoutElement = 'SplitsList';
+    }
+
+    if (element === LayoutElement.Title) {
+      layoutElement = 'Title';
+    }
+
+    if (element === LayoutElement.SumOfBest) {
+      layoutElement = 'SumOfBest';
+    }
+
+    if (element === LayoutElement.MostRecentSplitValue) {
+      layoutElement = 'MostRecentSplitValue';
+    }
+
+    return layoutElement;
+  }
+
   handleOpenedSplitArchive(archive: SplitArchive): void {
     this.currentSplitArchive = archive;
 
@@ -80,6 +136,8 @@ export class AppComponent implements OnInit {
     this.splitDisplays = this._state.generateSplitDisplays(this.splitSet.splits);
     this.currentRun = this._state.beginRun(this.splitDisplays);
     this._state.restart();
+
+    this._cd.detectChanges();
 
     console.log('currentSplitArchive', this.currentSplitArchive);
   }

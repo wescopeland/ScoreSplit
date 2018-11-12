@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { MenuItem, remote } from 'electron';
 
+import { ScoresplitSessionService } from '../state/scoresplit-session.service';
 import { SplitFileHandler } from './split-file-handler.service';
 import { Run } from '../state/models/run.model';
 import { SplitArchive } from '../state/models/split-archive.model';
@@ -18,7 +19,10 @@ export class ContextMenuComponent implements OnInit {
 
   @Output('reset-run') resetRun: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(private _splitFileHandler: SplitFileHandler) {}
+  constructor(
+    private _splitFileHandler: SplitFileHandler,
+    private _sessionService: ScoresplitSessionService
+  ) {}
 
   ngOnInit() {
     require('electron-context-menu')({
@@ -31,6 +35,15 @@ export class ContextMenuComponent implements OnInit {
           label: 'Reset Run',
           click: () => {
             this.resetRun.emit();
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'Edit Layout',
+          click: () => {
+            this._sessionService.toggleLayoutEditing();
           }
         },
         {

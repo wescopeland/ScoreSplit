@@ -4,9 +4,7 @@ import '../polyfills';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-
 import { AppRoutingModule } from './app-routing.module';
 
 // NG Translate
@@ -26,6 +24,7 @@ import { MostRecentSplitValueComponent } from './components/most-recent-split-va
 import { ResetButtonComponent } from './components/debug-buttons/reset-button.component';
 import { SumOfBestComponent } from './components/sum-of-best/sum-of-best.component';
 import { BonusesComponent } from './components/bonuses/bonuses.component';
+import { LayoutEditorComponent } from './layout-editor/layout-editor.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -46,7 +45,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     MostRecentSplitValueComponent,
     ResetButtonComponent,
     SumOfBestComponent,
-    BonusesComponent
+    BonusesComponent,
+    LayoutEditorComponent
   ],
   imports: [
     BrowserModule,
