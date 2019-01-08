@@ -8,12 +8,12 @@
 <div class="container-fluid no-padding">
 
   <div *ngIf="isEditingLayout$ | async">
-    <ss-layout-editor></ss-layout-editor>
+    <ss-layout-editor [layout]="layout"></ss-layout-editor>
   </div>
 
   <div *ngIf="!(isEditingLayout$ | async)">
     <div *ngFor="let layoutElement of layout.elements">
-      <div *ngIf="getLayoutElement(layoutElement) === 'Title'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'Title'">
         <ss-title
           [game-name]="currentSplitArchive.title"
           [category]="currentSplitArchive.category"
@@ -21,7 +21,7 @@
         </ss-title>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'SplitsList'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'SplitsList'">
         <ss-splits-list
           [current-run]="currentRun"
           [current-split-archive]="currentSplitArchive"
@@ -29,21 +29,21 @@
         </ss-splits-list>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'MostRecentSplitValue'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'MostRecentSplitValue'">
         <ss-most-recent-split-value
           [recent-value]="recentValue">
         </ss-most-recent-split-value>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'Deaths'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'Deaths'">
         <ss-deaths [deaths]="currentRun.deaths"></ss-deaths>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'Bonuses'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'Bonuses'">
         <ss-bonuses [bonuses]="currentRun.bonuses"></ss-bonuses>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'SumOfBest'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'SumOfBest'">
         <ss-sum-of-best
           [current-run]="currentRun"
           [current-split-archive]="currentSplitArchive"
@@ -51,18 +51,18 @@
         </ss-sum-of-best>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'Pace'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'Pace'">
         <ss-pace
           [current-run]="currentRun"
           [split-displays]="splitDisplays">
         </ss-pace>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'ManualInput'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'ManualInput'">
         <ss-manual-input></ss-manual-input>
       </div>
 
-      <div *ngIf="getLayoutElement(layoutElement) === 'GameVisionInput'">
+      <div *ngIf="getLayoutElement(layoutElement.element) === 'GameVisionInput'">
         <ss-game-vision-input driver="donkey-kong"></ss-game-vision-input>
       </div>
     </div>

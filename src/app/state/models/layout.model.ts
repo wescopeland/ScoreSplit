@@ -11,5 +11,5 @@ export enum LayoutElement {
 }
 
 export interface Layout {
-  elements: LayoutElement[];
+  elements: Array<{ element: LayoutElement; options?: any }>;
 }

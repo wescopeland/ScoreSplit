@@ -39,14 +39,14 @@ export class AppComponent implements OnInit {
   ) {
     this.layout = {
       elements: [
-        LayoutElement.Title,
-        LayoutElement.SplitsList,
-        LayoutElement.MostRecentSplitValue,
-        LayoutElement.Bonuses,
-        LayoutElement.Deaths,
-        LayoutElement.SumOfBest,
-        LayoutElement.Pace,
-        LayoutElement.ManualInput
+        { element: LayoutElement.Title },
+        { element: LayoutElement.SplitsList },
+        { element: LayoutElement.MostRecentSplitValue },
+        { element: LayoutElement.Bonuses },
+        { element: LayoutElement.Deaths },
+        { element: LayoutElement.SumOfBest },
+        { element: LayoutElement.Pace },
+        { element: LayoutElement.ManualInput }
       ]
     };
   }

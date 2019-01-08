@@ -60,7 +60,7 @@ export class ContextMenuComponent implements OnInit {
           }
         }
       ],
-      showInspectElement: false
+      showInspectElement: true
     });
   }
 

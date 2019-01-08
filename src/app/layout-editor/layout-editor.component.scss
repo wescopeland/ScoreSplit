@@ -1,0 +1,27 @@
+h6 {
+  margin-top: 4px;
+}
+
+button:disabled,
+button[disabled] {
+  cursor: not-allowed;
+}
+
+.layout__elements-list {
+  border: 1px solid white;
+  border-radius: 7px;
+}
+
+.selected-element {
+  background-color: red;
+  color: green;
+}
+
+.layout__buttons-row button {
+  margin-right: 16px;
+  min-width: 22px;
+}
+
+.row > .col > p {
+  margin-bottom: 0;
+}

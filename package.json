@@ -39,7 +39,6 @@
   "dependencies": {
     "@datorama/akita": "^1.18.0",
     "@ng-bootstrap/ng-bootstrap": "^3.3.0",
-    "@wescopeland/game-vision": "../../documents/game-vision",
     "bootstrap": "^4.1.3",
     "electron-context-menu": "^0.10.1",
     "jquery": "^3.3.1",
