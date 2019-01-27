@@ -6,9 +6,9 @@
 
   <div class="row column-headers--row sticky-top">
     <div class="col"></div>
-    <div *ngIf="layout.columnThreeValue" class="col text-right">{{ getColumnHeaderLabel(layout.columnThreeValue) }}</div>
-    <div *ngIf="layout.columnTwoValue" class="col text-right">{{ getColumnHeaderLabel(layout.columnTwoValue) }}</div>
-    <div class="col text-right">{{ getColumnHeaderLabel(layout.columnOneValue) }}</div>
+    <div *ngIf="columns.columnThreeValue" class="col text-right">{{ getColumnHeaderLabel(columns.columnThreeValue) }}</div>
+    <div *ngIf="columns.columnTwoValue" class="col text-right">{{ getColumnHeaderLabel(columns.columnTwoValue) }}</div>
+    <div class="col text-right">{{ getColumnHeaderLabel(columns.columnOneValue) }}</div>
   </div>
 
   <div *ngFor="let splitDisplay of splitDisplays; last as isLast">
@@ -19,9 +19,9 @@
         [is-current]="splitDisplay.id === currentRun.currentSplitId"
         [is-alternating]="splitDisplay.isAlternating"
         [current-maximum-value]="splitMaximums[splitDisplay.id]"
-        [column-one-value]="getColumnValue(layout.columnOneValue, currentRun, splitDisplay.id)"
-        [column-two-value]="getColumnValue(layout.columnTwoValue, currentRun, splitDisplay.id)"
-        [column-three-value]="getColumnValue(layout.columnThreeValue, currentRun, splitDisplay.id)">
+        [column-one-value]="getColumnValue(columns.columnOneValue, currentRun, splitDisplay.id)"
+        [column-two-value]="getColumnValue(columns.columnTwoValue, currentRun, splitDisplay.id)"
+        [column-three-value]="getColumnValue(columns.columnThreeValue, currentRun, splitDisplay.id)">
       </ss-split>
 
       <div *ngIf="getIfAnySubsplitIsActive(splitDisplay, currentRun)">
@@ -35,9 +35,9 @@
             [is-current]="subsplit.id === currentRun.currentSplitId"
             [is-alternating]="subsplit.isAlternating"
             [current-maximum-value]="splitMaximums[subsplit.id]"
-            [column-one-value]="getColumnValue(layout.columnOneValue, currentRun, subsplit.id)"
-            [column-two-value]="getColumnValue(layout.columnTwoValue, currentRun, subsplit.id)"
-            [column-three-value]="getColumnValue(layout.columnThreeValue, currentRun, subsplit.id)">
+            [column-one-value]="getColumnValue(columns.columnOneValue, currentRun, subsplit.id)"
+            [column-two-value]="getColumnValue(columns.columnTwoValue, currentRun, subsplit.id)"
+            [column-three-value]="getColumnValue(columns.columnThreeValue, currentRun, subsplit.id)">
           </ss-split>
         </div>
       </div>
@@ -54,8 +54,8 @@
     [is-alternating]="finalSplit.isAlternating"
     [is-final]="true"
     [is-subsplit]="finalSplit.isSubsplit && getIfFinalParentHasActiveSubsplits(getParentBySubsplitId(finalSplit.id, splitDisplays), currentRun)"
-    [column-one-value]="getColumnValue(layout.columnOneValue, currentRun, finalSplit.id)"
-    [column-two-value]="getColumnValue(layout.columnTwoValue, currentRun, finalSplit.id)"
-    [column-three-value]="getColumnValue(layout.columnThreeValue, currentRun, finalSplit.id)">
+    [column-one-value]="getColumnValue(columns.columnOneValue, currentRun, finalSplit.id)"
+    [column-two-value]="getColumnValue(columns.columnTwoValue, currentRun, finalSplit.id)"
+    [column-three-value]="getColumnValue(columns.columnThreeValue, currentRun, finalSplit.id)">
   </ss-split>
 </div>

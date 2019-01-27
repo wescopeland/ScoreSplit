@@ -3,13 +3,13 @@ import { formatNumber } from '@angular/common';
 import { Subscription } from 'rxjs';
 import * as leftPad from 'left-pad';
 
-import { SplitsListColumns, SplitsListLayout } from './splits-list.layout.model';
 import { ScoresplitMessengerService } from '../../messenger/messenger.service';
 import { ScoresplitStateService } from '../../state/service/state.service';
 import { Run } from '../../state/models/run.model';
 import { Split } from '../../state/models/split.model';
 import { SplitArchive } from '../../state/models/split-archive.model';
 import { SplitDisplay } from '../../state/models/split-display.model';
+import { Column } from '../../state/models/column.model';
 
 @Component({
   selector: 'ss-splits-list',
@@ -17,6 +17,7 @@ import { SplitDisplay } from '../../state/models/split-display.model';
   styleUrls: ['./splits-list.component.scss']
 })
 export class SplitsListComponent implements OnInit, OnChanges {
+  @Input('columns') columns: Column[];
   @Input('current-run') currentRun: Run;
   @Input('current-split-archive') currentSplitArchive: SplitArchive;
   @Input('split-displays') splitDisplays: SplitDisplay[];
@@ -28,13 +29,6 @@ export class SplitsListComponent implements OnInit, OnChanges {
   public pbSplitSumValues: number[] = [];
   public pbRun: Run;
   public visibleSplitIds = [];
-
-  // TODO: This will eventually go into a separate layout file.
-  public layout: SplitsListLayout = {
-    columnOneValue: SplitsListColumns.Sum,
-    columnTwoValue: SplitsListColumns.SplitValue,
-    columnThreeValue: SplitsListColumns.VsPB
-  };
 
   private _subscription: Subscription;
 
@@ -125,14 +119,14 @@ export class SplitsListComponent implements OnInit, OnChanges {
     return Math.abs(((numberA - numberB) / numberB) * 100);
   }
 
-  getColumnHeaderLabel(column: SplitsListColumns): string {
+  getColumnHeaderLabel(column: Column): string {
     let label = '';
 
-    if (column === SplitsListColumns.Sum) {
+    if (column === Column.Sum) {
       return 'Total';
-    } else if (column === SplitsListColumns.SplitValue) {
+    } else if (column === Column.SplitValue) {
       return 'Segment';
-    } else if (column === SplitsListColumns.VsPB) {
+    } else if (column === Column.VsPB) {
       return 'Vs PB';
     }
 
@@ -161,7 +155,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
     return isActive;
   }
 
-  getColumnValue(valueType: SplitsListColumns, currentRun: Run, splitId: number): any {
+  getColumnValue(valueType: Column, currentRun: Run, splitId: number): any {
     let selectedSplit = this._state.getCurrentSplitDisplay(splitId, this.splitDisplays);
     let currentSplit = this._state.getCurrentSplitDisplay(
       currentRun.currentSplitId,
@@ -177,8 +171,9 @@ export class SplitsListComponent implements OnInit, OnChanges {
       isParentOfSubsplitActive = true;
     }
 
-    if (valueType === SplitsListColumns.Sum) {
+    if (valueType === Column.Sum) {
       let color = 'neutral';
+      let appender = '';
 
       if (this.pbRun) {
         let currentAdjustedScore =
@@ -188,6 +183,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
 
         let percentDifference = this.getPercentDifference(currentAdjustedScore, pbAdjustedScore);
         if (currentAdjustedScore > pbAdjustedScore) {
+          appender = '+';
           if (percentDifference <= 3) {
             color = 'light-green';
           } else if (percentDifference > 3 && percentDifference < 9) {
@@ -196,6 +192,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
             color = 'strong-green';
           }
         } else if (currentAdjustedScore < pbAdjustedScore) {
+          appender = '-';
           if (percentDifference <= 3) {
             color = 'light-red';
           } else if (percentDifference > 3 && percentDifference < 9) {
@@ -209,8 +206,10 @@ export class SplitsListComponent implements OnInit, OnChanges {
       let value;
       if (isParentOfSubsplitActive) {
         color = 'neutral';
+        appender = '...';
+
         value = currentRun.sumTable[splitId]
-          ? '...' + formatNumber(currentRun.sumTable[splitId], 'en-US')
+          ? formatNumber(currentRun.sumTable[splitId], 'en-US')
           : null;
       } else {
         value = currentRun.sumTable[splitId]
@@ -220,10 +219,11 @@ export class SplitsListComponent implements OnInit, OnChanges {
 
       return {
         value: value,
+        appender: appender,
         color: color,
         hasDesignator: false
       };
-    } else if (valueType === SplitsListColumns.SplitValue) {
+    } else if (valueType === Column.SplitValue) {
       let color = 'neutral';
 
       if (currentRun.splitFinishes[splitId]) {
@@ -272,9 +272,10 @@ export class SplitsListComponent implements OnInit, OnChanges {
         color: color,
         hasDesignator: true
       };
-    } else if (valueType === SplitsListColumns.VsPB) {
+    } else if (valueType === Column.VsPB) {
       if (isParentOfSubsplitActive) {
         return {
+          appender: '',
           value: null,
           color: 'neutral',
           hasDesignator: false
@@ -283,6 +284,7 @@ export class SplitsListComponent implements OnInit, OnChanges {
 
       if (!this.pbRun) {
         return {
+          appender: '',
           value: null,
           color: 'neutral',
           hasDesignator: false
@@ -290,25 +292,27 @@ export class SplitsListComponent implements OnInit, OnChanges {
       }
 
       let percentDifference = this.getPercentDifference(
-        currentRun.splitFinishes[splitId],
-        this.pbSplitSegmentValues[splitId]
+        currentRun.sumTable[splitId],
+        this.pbSplitSumValues[splitId]
       );
 
       if (currentRun.splitFinishes[splitId] > this.splitMaximums[splitId]) {
         return {
-          value: currentRun.splitFinishes[splitId]
-            ? formatNumber(currentRun.splitFinishes[splitId] - this.splitMaximums[splitId], 'en-US')
+          appender: '+',
+          value: currentRun.sumTable[splitId]
+            ? formatNumber(currentRun.sumTable[splitId] - this.pbSplitSumValues[splitId], 'en-US')
             : null,
           color: 'gold',
           hasDesignator: true
         };
-      } else if (currentRun.splitFinishes[splitId] === this.pbSplitSegmentValues[splitId]) {
+      } else if (currentRun.sumTable[splitId] === this.pbSplitSumValues[splitId]) {
         return {
-          value: currentRun.splitFinishes[splitId] ? '-' : null,
+          appender: '',
+          value: currentRun.sumTable[splitId] ? '-' : null,
           color: 'neutral',
           hasDesignator: true
         };
-      } else if (currentRun.splitFinishes[splitId] > this.pbSplitSegmentValues[splitId]) {
+      } else if (currentRun.sumTable[splitId] > this.pbSplitSumValues[splitId]) {
         let color = '';
 
         if (percentDifference <= 3) {
@@ -320,16 +324,14 @@ export class SplitsListComponent implements OnInit, OnChanges {
         }
 
         return {
-          value: currentRun.splitFinishes[splitId]
-            ? formatNumber(
-                currentRun.splitFinishes[splitId] - this.pbSplitSegmentValues[splitId],
-                'en-US'
-              )
+          appender: '+',
+          value: currentRun.sumTable[splitId]
+            ? formatNumber(currentRun.sumTable[splitId] - this.pbSplitSumValues[splitId], 'en-US')
             : null,
           color: color,
           hasDesignator: true
         };
-      } else if (currentRun.splitFinishes[splitId] < this.pbSplitSegmentValues[splitId]) {
+      } else if (currentRun.sumTable[splitId] < this.pbSplitSumValues[splitId]) {
         let color = '';
 
         if (percentDifference <= 3) {
@@ -341,9 +343,10 @@ export class SplitsListComponent implements OnInit, OnChanges {
         }
 
         return {
-          value: currentRun.splitFinishes[splitId]
+          appender: '-',
+          value: currentRun.sumTable[splitId]
             ? formatNumber(
-                Math.abs(currentRun.splitFinishes[splitId] - this.pbSplitSegmentValues[splitId]),
+                Math.abs(currentRun.sumTable[splitId] - this.pbSplitSumValues[splitId]),
                 'en-US'
               )
             : null,

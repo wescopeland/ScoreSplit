@@ -1,3 +1,5 @@
+import { Column } from './column.model';
+
 export enum LayoutElement {
   Title,
   SplitsList,
@@ -12,4 +14,9 @@ export enum LayoutElement {
 
 export interface Layout {
   elements: Array<{ element: LayoutElement; options?: any }>;
+  columns: {
+    columnOneValue: Column,
+    columnTwoValue?: Column,
+    columnThreeValue?: Column
+  }
 }

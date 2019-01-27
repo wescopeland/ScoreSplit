@@ -1,19 +1,7 @@
 {
-  "name": "angular-electron",
-  "version": "4.2.2",
-  "description": "Angular 6 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
-  "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
-  },
-  "keywords": [
-    "angular",
-    "angular 6",
-    "electron",
-    "typescript",
-    "sass"
-  ],
+  "name": "scoresplit",
+  "version": "0.0.1",
+  "description": "Live high score tracking app",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -39,6 +27,7 @@
   "dependencies": {
     "@datorama/akita": "^1.18.0",
     "@ng-bootstrap/ng-bootstrap": "^3.3.0",
+    "@wescopeland/game-vision": "../game-vision",
     "bootstrap": "^4.1.3",
     "electron-context-menu": "^0.10.1",
     "jquery": "^3.3.1",

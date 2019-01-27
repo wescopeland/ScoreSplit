@@ -23,6 +23,7 @@
 
       <div *ngIf="getLayoutElement(layoutElement.element) === 'SplitsList'">
         <ss-splits-list
+          [columns]="layout.columns"
           [current-run]="currentRun"
           [current-split-archive]="currentSplitArchive"
           [split-displays]="splitDisplays">

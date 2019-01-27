@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, HostListener } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import { ScoresplitStateService } from './state/service/state.service';
@@ -8,6 +8,7 @@ import { SplitArchive } from './state/models/split-archive.model';
 import { Split } from './state/models/split.model';
 import { SplitDisplay } from './state/models/split-display.model';
 import { Run } from './state/models/run.model';
+import { Column } from './state/models/column.model';
 import { Layout, LayoutElement } from './state/models/layout.model';
 
 import { DkPbSplitArchive } from './state/demo/dk-pb.split-archive';
@@ -21,6 +22,13 @@ import { pacManSplits } from './state/demo/pac-man.splits';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(e: KeyboardEvent) {
+    if (e.key === 'b') {
+      this._messenger.publishMessage('AUTOCAPTURE', null, 'AppComponent');
+    }
+  }
+
   public currentRun: Run;
   public currentSplitArchive: SplitArchive;
   public isEditingLayout$ = this._sessionQuery.select(state => state.isEditingLayout);
@@ -42,12 +50,17 @@ export class AppComponent implements OnInit {
         { element: LayoutElement.Title },
         { element: LayoutElement.SplitsList },
         { element: LayoutElement.MostRecentSplitValue },
-        { element: LayoutElement.Bonuses },
+        // { element: LayoutElement.Bonuses },
         { element: LayoutElement.Deaths },
         { element: LayoutElement.SumOfBest },
         { element: LayoutElement.Pace },
-        { element: LayoutElement.ManualInput }
-      ]
+        { element: LayoutElement.GameVisionInput }
+        // { element: LayoutElement.ManualInput }
+      ],
+      columns: {
+        columnOneValue: Column.SplitValue,
+        columnTwoValue: Column.VsPB
+      }
     };
   }
 
@@ -91,6 +104,10 @@ export class AppComponent implements OnInit {
 
     if (element === LayoutElement.ManualInput) {
       layoutElement = 'ManualInput';
+    }
+
+    if (element === LayoutElement.GameVisionInput) {
+      layoutElement = 'GameVisionInput';
     }
 
     if (element === LayoutElement.Pace) {
@@ -137,6 +154,8 @@ export class AppComponent implements OnInit {
     this.currentRun = this._state.beginRun(this.splitDisplays);
     this._state.restart();
 
+    this._messenger.publishMessage('AUTORESET', null, 'AppComponent');
+
     this._cd.detectChanges();
 
     console.log('currentSplitArchive', this.currentSplitArchive);
@@ -152,15 +171,21 @@ export class AppComponent implements OnInit {
       }
 
       if (e.header === 'DEATH') {
+        this.recentValue = e.message;
         this.currentRun = {
           ...this._state.addDeath(e.message, this.currentRun, this.splitDisplays)
         };
       }
 
       if (e.header === 'BONUS') {
+        this.recentValue = e.message;
         this.currentRun = {
           ...this._state.addBonus(e.message, this.currentRun)
         };
+      }
+
+      if (e.header === 'RESET') {
+        this.handleResetRun();
       }
     });
   }
